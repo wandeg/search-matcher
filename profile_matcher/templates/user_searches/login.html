@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form method="POST" action="{{url_for('user_searches.login')}}">
+  <div class="form-group">
+    <label for="loginEmail">Email</label>
+    <input type="text" name="email" class="form-control" id="loginEmail" placeholder="Email">
+  </div>
+  <div class="form-group">
+    <label for="loginPassword">Password</label>
+    <input type="password" name="password" class="form-control" id="loginPassword" placeholder="Password">
+  </div>  
+  <button type="submit" class="btn btn-default">Login</button>
+</form>
+{% endblock %}
