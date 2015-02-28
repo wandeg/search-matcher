@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block page_header %}
+  <div class="page-header">
+    <h1>{{ search.title }}</h1>
+  </div>
+{% endblock %}
+
+{% block content %}
+  <p>{{ search.created_at.strftime('%H:%M %Y-%m-%d') }}</p>
+  <hr>
+  <h2>Parameters</h2>
+  {% if search.terms %}
+    {% set terms = search.terms %}
+      <p>Age: {{terms.age}}</p>
+      <p>Company: {{terms.company}}</p>
+      <p>Gender: {{terms.gender}}</p>
+      {% set tags = terms.tags %}
+      <p>Tags:</p>
+      <p>{% for tag in tags %}
+      {{tag}}
+      {% endfor %}</p>
+    
+  {% endif %}
+  <h2>Results</h2>
+  {% if search.results %}
+    {% for res in search.results %}
+       <p>{{ res.name }}</p>
+       
+    {% endfor %}
+  {% endif %}
+{% endblock %}
