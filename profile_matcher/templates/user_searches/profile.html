@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block page_header %}
+  <div class="page-header">
+    <h1>{{ user.name }}</h1>
+  </div>
+{% endblock %}
+
+{% block content %}
+<div id="user_searches">
+	<h2>My Searches</h2>
+	<a href="#">View All</a>
+</div>
+
+<div id="user_friends">
+	<h2>My Friends</h2>
+	<a href="#">View All</a>
+</div>
+
+<div id="people_you_may_know">
+	<a href="#">View All</a>
+</div>
+  
+
+{% endblock %}

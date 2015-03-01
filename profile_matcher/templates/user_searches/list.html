@@ -6,7 +6,7 @@
       <p>
         {{ search.created_at.strftime('%H:%M %Y-%m-%d') }} |
         {% with total=search.results|length %}
-            {{ total }} comment {%- if total > 1 %}s{%- endif -%}
+            {{ total }} result {%- if total > 1 %}s{%- endif -%}
         {% endwith %}
       </p>
     {% endfor %}

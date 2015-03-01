@@ -17,7 +17,7 @@ class People(db.Document):
 	address=db.StringField()
 	about=db.StringField()
 	registered=db.DateTimeField()
-	tags=db.ListField(db.StringField(max_length=10))
+	tags=db.ListField(db.StringField())
 	friends=db.ListField(db.EmbeddedDocumentField('Friend'))
 	terms_used=db.DictField()
 	password=db.StringField()
@@ -37,6 +37,15 @@ class People(db.Document):
 		else:
 			return True
 
+	def unpack_terms(self):
+		unpacked={}
+		my_terms=self.terms_used
+		if my_terms:
+			for key in my_terms.keys():
+				unpacked.update(my_terms[key])
+		return unpacked
+
+
 class Friend(db.EmbeddedDocument):
 	id=db.IntField()
 	name=db.StringField()
@@ -53,12 +62,8 @@ class UserSearch(db.Document):
 	slug=db.StringField()
 	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
 	terms=db.DictField()
-	results=db.ListField(db.EmbeddedDocumentField('Result'))
+	results=db.ListField()
 
-
-
-class Result(db.EmbeddedDocument):
-	match=db.ReferenceField('People')
 
 class ProfileView(db.Document):
 	user=db.ReferenceField('People',reverse_delete_rule=CASCADE)
