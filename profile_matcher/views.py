@@ -1,5 +1,6 @@
 import actions
 from dateutil.parser import parse
+from collections import Counter
 from flask import Blueprint, request, redirect, render_template
 from flask import url_for, session, flash
 from flask.views import MethodView
@@ -33,23 +34,24 @@ def get_users_with_similar_searches(searches,my_id):
 		cache.set('similar_users', similar_users, timeout=3600)
 	return similar_users
 
-def get_users_with_similar_profiles(user):
-	# print user.name
-	reason="No users you may know"
-	friends=[]
-	if not friends:
-		friends=People.objects(Q(friends__in=user.friends)) 
-		reason="You have mutual friends"
-	if not friends or len(friends <10):
-		friends=People.objects(Q(company=user.company))
-		reason="You are workmates"
-	if not friends or len(friends <10):
-		friends=People.objects(Q(tags__in=user.tags))
-		reason="You have similar tags"
-	# friends=People.objects(email__ne=user.email)
-	print user.tags
-	print friends
-	print len(friends)
+def get_users_with_similar_friends(user):
+	friends=People.objects(friends__in=user.friends).only("guid","name")
+	return friends
+
+def get_colleagues(user):
+	colleagues=People.objects(company=user.company).only("guid","name")
+	return colleagues
+
+def get_users_with_similar_tags(user):
+	similar_tags=People.objects(tags__in=user.tags).only("guid","name")
+	return similar_tags
+
+def get_my_common_results(user):
+	my_searches=UserSearch.objects(user=user)
+	print my_searches
+	my_results=[result for search in my_searches 
+				for result in search.results ]
+	return Counter(my_results).most_common(10)
 
 class ListView(MethodView):
 
@@ -59,9 +61,7 @@ class ListView(MethodView):
 			user=People.objects.get(email=session['user']['email'])
 			user_searches = UserSearch.objects(user=user)
 			searches = get_searches()
-			get_users_with_similar_profiles(user)
 			similar_search_users=get_users_with_similar_searches(searches,user.guid)
-			print similar_search_users
 			for usr in similar_search_users:
 				user=People.objects.get(guid=usr[1])
 				print user
@@ -107,7 +107,7 @@ class SearchView(MethodView):
 		user=People.objects.get(email=logged_in_user['email'])
 		if user:
 			if hasattr(user,'terms_used'):
-				terms={'age':{},'gender':{},'company':{},'tags':{}}
+				terms=user.terms_used
 			else:
 				terms={'age':{},'gender':{},'company':{},'tags':{}}
 			if age:
@@ -166,20 +166,44 @@ class LogoutView(MethodView):
 
 class ProfileView(MethodView):
 
-    def get(self):
-    	if 'user' in session:
-			user=People.objects.get(email=session['user']['email'])
-			user_searches = UserSearch.objects(user=user)
-			searches = get_searches()
-			get_users_with_similar_profiles(user)
-			similar_search_users=get_users_with_similar_searches(searches,user.guid)
-			print similar_search_users
-			for usr in similar_search_users:
-				user=People.objects.get(guid=usr[1])
-				print user
+    def get(self,guid):
+		
+		#  	if 'user' in session:
+		# user=session['user']
+		profile={}
+		user=People.objects.get(guid=guid)
+		profile['user']=user
+		if session['user']['guid'] == user['guid']:
+			friends=[]
+			colleagues=[]
+			similar_tags=[]
+			most_returned=[]
+			friends=get_users_with_similar_friends(user)[:10]
+			colleagues=get_colleagues(user)[:10]
+			similar_tags=get_users_with_similar_tags(user)[:10]
+			most_returned= get_my_common_results(user)
+			profile['mutual_friends']=friends
+			profile['colleagues']=colleagues
+			profile['similar_tags']=similar_tags
+			profile['most_returned']=[People.objects.get(guid=res[0])
+										for res in most_returned]
+			
+		else:
+			# print session['user']
+			# print type(session['user'])
+			sess_user=People.objects.get(guid=session['user']['guid'])
+			profiles_viewed=sess_user.profiles_viewed
+			profiles_viewed[guid]=profiles_viewed.get(guid,0)+1
+			sess_user.profiles_viewed=profiles_viewed
+			sess_user.save()
+			
+		# similar_search_users=get_users_with_similar_searches(searches,user.guid)
+		# print similar_search_users
+		# for usr in similar_search_users:
+		# 	user=People.objects.get(guid=usr[1])
+		# 	print user
 
-        return render_template('user_searches/profile.html', 
-        	user_searches=user_searches)
+		return render_template('user_searches/profile.html',profile=profile)
 
 
 
@@ -188,4 +212,5 @@ user_searches.add_url_rule('/', view_func=ListView.as_view('list'))
 user_searches.add_url_rule('/login/', view_func=LoginView.as_view('login'),methods=["GET","POST"])
 user_searches.add_url_rule('/logout/', view_func=LogoutView.as_view('logout'),methods=["GET"])
 user_searches.add_url_rule('/search', view_func=SearchView.as_view('search'),methods=["GET","POST"])
+user_searches.add_url_rule('/profile/<guid>/', view_func=ProfileView.as_view('profile'))
 user_searches.add_url_rule('/<slug>/', view_func=DetailView.as_view('detail'))

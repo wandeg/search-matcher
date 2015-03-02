@@ -2,24 +2,78 @@
 
 {% block page_header %}
   <div class="page-header">
-    <h1>{{ user.name }}</h1>
+    <h1>{{ profile['user']['name'] }}</h1>
   </div>
 {% endblock %}
 
 {% block content %}
-<div id="user_searches">
-	<h2>My Searches</h2>
-	<a href="#">View All</a>
-</div>
-
+<img src="{{profile['user'].picture}}">
+{% if profile['user'].friends %}
 <div id="user_friends">
-	<h2>My Friends</h2>
-	<a href="#">View All</a>
+	<h2>Friends</h2>
+	<ul>
+	{% for friend in profile['user'].friends %}
+	 <li>{{friend.name}}</li>
+	{% endfor %}
+	</ul>
+	
 </div>
-
+{% endif %}
+{% if profile['user']['guid'] == session['user']['guid'] %}
 <div id="people_you_may_know">
-	<a href="#">View All</a>
+<h2>People you may know</h2>
+	{% if profile['mutual_friends'] %}
+	<ul>
+	{% for mf in profile['mutual_friends'] %}
+		{% if mf.guid != profile['user']['guid'] %}
+		<li>
+			<a href="{{ url_for('user_searches.profile',guid=mf.guid) }}">{{mf.name}}</a> You have mutual friends
+		</li>
+		
+		{% endif %}
+	{% endfor %}
+	</ul>
+	{% endif %}
+
+	{% if profile['colleagues'] %}
+	<ul>
+	{% for col in profile['colleagues'] %}
+		{% if col.guid != profile['user']['guid'] %}
+		<li>
+			<a href="{{ url_for('user_searches.profile',guid=col.guid) }}">{{col.name}}</a> You are work colleagues
+		</li>
+		{% endif %}
+	{% endfor %}
+	</ul>
+	{% endif %}
+
+	{% if profile['similar_tags'] %}
+	<ul>
+	{% for tagged in profile['similar_tags'] %}
+		{% if tagged.guid != profile['user']['guid'] %}
+		<li>
+			<a href="{{ url_for('user_searches.profile',guid=tagged.guid) }}">{{tagged.name}}</a> You have similar tags
+		</li>
+		{% endif %}
+	{% endfor %}
+	</ul>
+	{% endif %}
+
+	{% if profile['most_returned'] %}
+	<ul>
+	{% for res in profile['most_returned'] %}
+		{% if res.guid != profile['user']['guid'] %}
+		<li>
+			<a href="{{ url_for('user_searches.profile',guid=res.guid) }}">
+			{{res.name}}</a> User fits a majority of your previous search parameters
+		</li>
+		{% endif %}
+	{% endfor %}
+	</ul>
+	{% endif %}
+
 </div>
+{%endif %}
   
 
 {% endblock %}

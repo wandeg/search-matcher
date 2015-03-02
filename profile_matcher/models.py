@@ -20,6 +20,7 @@ class People(db.Document):
 	tags=db.ListField(db.StringField())
 	friends=db.ListField(db.EmbeddedDocumentField('Friend'))
 	terms_used=db.DictField()
+	profiles_viewed=db.DictField()
 	password=db.StringField()
 
 	def __unicode__(self):
