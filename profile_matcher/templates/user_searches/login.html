@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form method="POST" action="{{url_for('user_searches.login')}}">
+<form method="POST" class="form-signin" action="{{url_for('user_searches.login')}}">
   <div class="form-group">
     <label for="loginEmail">Email</label>
     <input type="text" name="email" class="form-control" id="loginEmail" placeholder="Email">

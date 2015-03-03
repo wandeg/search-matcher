@@ -22,7 +22,7 @@
   <h2>Results</h2>
   {% if search.results %}
     {% for res in search.results %}
-       <a href="{{ res }}">{{res}}</a>
+       <a href="/profile/{{ res.guid }}">{{res.name}}</a>
        
     {% endfor %}
   {% endif %}

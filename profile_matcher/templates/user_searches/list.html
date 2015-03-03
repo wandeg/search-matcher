@@ -2,7 +2,7 @@
 
 {% block content %}
     {% for search in user_searches %}
-      <h2><a href="{{ url_for('user_searches.detail', slug=search.slug) }}">{{ search.title }}</a></h2>
+      <h2><a href="{{ url_for('user_searches.detail', slug=search.slug) }}">Search {{ loop.index }}</a></h2>
       <p>
         {{ search.created_at.strftime('%H:%M %Y-%m-%d') }} |
         {% with total=search.results|length %}

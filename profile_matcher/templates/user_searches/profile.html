@@ -2,16 +2,22 @@
 
 {% block page_header %}
   <div class="page-header">
+  <div id="profile-header">
+  	<img id="profile-img" src="{{profile['user'].picture}}">
     <h1>{{ profile['user']['name'] }}</h1>
+    <p>Works at {{profile['user'].company}}</p>
+  </div>
+  
   </div>
 {% endblock %}
 
 {% block content %}
-<img src="{{profile['user'].picture}}">
+
+
 {% if profile['user'].friends %}
 <div id="user_friends">
 	<h2>Friends</h2>
-	<ul>
+	<ul class="lv_ns">
 	{% for friend in profile['user'].friends %}
 	 <li>{{friend.name}}</li>
 	{% endfor %}
@@ -23,11 +29,11 @@
 <div id="people_you_may_know">
 <h2>People you may know</h2>
 	{% if profile['mutual_friends'] %}
-	<ul>
+	<ul class="lv_ns">
 	{% for mf in profile['mutual_friends'] %}
 		{% if mf.guid != profile['user']['guid'] %}
 		<li>
-			<a href="{{ url_for('user_searches.profile',guid=mf.guid) }}">{{mf.name}}</a> You have mutual friends
+			<a href="{{ url_for('user_searches.profile',guid=mf.guid) }}">{{mf.name}}</a> <span class="right">You have mutual friends</span>
 		</li>
 		
 		{% endif %}
@@ -36,11 +42,11 @@
 	{% endif %}
 
 	{% if profile['colleagues'] %}
-	<ul>
+	<ul class="lv_ns">
 	{% for col in profile['colleagues'] %}
 		{% if col.guid != profile['user']['guid'] %}
 		<li>
-			<a href="{{ url_for('user_searches.profile',guid=col.guid) }}">{{col.name}}</a> You are work colleagues
+			<a href="{{ url_for('user_searches.profile',guid=col.guid) }}">{{col.name}}</a> <span class="right">You are work colleagues</span>
 		</li>
 		{% endif %}
 	{% endfor %}
@@ -48,11 +54,11 @@
 	{% endif %}
 
 	{% if profile['similar_tags'] %}
-	<ul>
+	<ul class="lv_ns">
 	{% for tagged in profile['similar_tags'] %}
 		{% if tagged.guid != profile['user']['guid'] %}
 		<li>
-			<a href="{{ url_for('user_searches.profile',guid=tagged.guid) }}">{{tagged.name}}</a> You have similar tags
+			<a href="{{ url_for('user_searches.profile',guid=tagged.guid) }}">{{tagged.name}}</a><span class="right"> You share one or more tags</span>
 		</li>
 		{% endif %}
 	{% endfor %}
@@ -60,12 +66,12 @@
 	{% endif %}
 
 	{% if profile['most_returned'] %}
-	<ul>
+	<ul class="lv_ns">
 	{% for res in profile['most_returned'] %}
 		{% if res.guid != profile['user']['guid'] %}
 		<li>
 			<a href="{{ url_for('user_searches.profile',guid=res.guid) }}">
-			{{res.name}}</a> User fits a majority of your previous search parameters
+			{{res.name}}</a><span class="right"> User fits a majority of your previous search parameters</span>
 		</li>
 		{% endif %}
 	{% endfor %}

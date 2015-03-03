@@ -3,32 +3,63 @@
   <head>
     <meta charset="utf-8">
     <title>Profile Searcher</title>
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
-    <style>.content {padding-top: 80px;}</style>
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/bootstrap.min.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/bootstrap-theme.min.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/style.css')}}">
+    <script type="text/javascript" src="{{url_for('static', filename='js/jquery-2.1.3.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
+    <script type="text/javascript">
+    {% block js %}
+    {% endblock %}
+    </script>
   </head>
+
 
   <body>
 
-    {%- block topbar -%}
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
+    <div class="page-header">
+    {% block navigation %}
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
         <div class="navbar-header">
-          <h2>
-              <a href="/" class="brand">Profile Searcher</a> 
-          </h2>
-          <a href="{{ url_for('user_searches.login') }}">Login</a>
-          
-          {% if session['user'] %}
-          <a href="{{ url_for('user_searches.profile',guid=session['user']['guid']) }}">Profile</a>
-          <a href="{{ url_for('user_searches.logout') }}">Logout</a>
-          {% endif %}
+          <a href="/" class="navbar-brand">Profile Searcher</a> 
         </div>
-        <div class="navbar-collapse">
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            {% if session['user'] %}
+            <li>
+                <a href="{{ url_for('user_searches.profile',guid=session['user']['guid']) }}">My Profile</a>
+            </li>
+            <li>
+                <a href="{{ url_for('user_searches.my_searches') }}">My Searches</a>
+            </li>
+            <li>
+                <a href="{{ url_for('user_searches.search') }}">Search</a>
+            </li>
+            <li>
+                <a href="{{ url_for('user_searches.logout') }}">Logout</a>
+            </li>
+            
+        {% else %}
+            
+            <li>
+                <a href="{{ url_for('user_searches.login') }}">Login</a>
+            </li>
+            
+        {%endif%}
 
+          </ul>
         </div><!--/.nav-collapse -->
       </div>
     </nav>
-    {%- endblock -%}
+    {% endblock %}
+    </div>
+
+    
 
     <div class="container">
       <div class="content">
