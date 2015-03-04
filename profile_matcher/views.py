@@ -63,6 +63,14 @@ def get_my_most_common_results(user):
 	# print my_results
 	return Counter(my_results).most_common(10)
 
+def most_common_queries_per_category(user):
+	terms_used=user.terms_used
+	common={}
+	for k,v in terms_used.items():
+		common[k]=Counter(v).most_common(1)
+	return common
+
+
 
 class HomeView(MethodView):
 	def get(self):
@@ -102,20 +110,24 @@ class SearchView(MethodView):
 		if 'user' in session:
 			my_id = session['user']['guid']
 			user=People.objects.get(guid=my_id)
+			suggestions={}
 			# print session['user']
 			searches = get_searches()
-			my_searches=searches[my_id]
+			my_searches = searches[my_id]
 			# print my_searches
-			ordered_searches=sorted(my_searches.items(),
+			ordered_searches = sorted(my_searches.items(),
 								key=operator.itemgetter(1), reverse=True)
 			print ordered_searches
-			suggestions = get_suggestion_from_other_searches(searches,my_id)
-			print suggestions
+			param_suggestions = get_suggestion_from_other_searches(searches,my_id)
+			suggestions['param_suggestions'] = param_suggestions
 			profiles_viewed = user.profiles_viewed
 			if profiles_viewed:
 				most_viewed = Counter(profiles_viewed).most_common(3)
-			
-			return render_template('user_searches/search.html')
+				if most_viewed:
+					print most_viewed
+					suggestions['most_viewed'] = [People.objects.get(guid=res[0]) for res in most_viewed] 
+					print suggestions['most_viewed']
+			return render_template('user_searches/search.html',suggestions=suggestions)
 		else:
 			return redirect('/login')
 
@@ -144,13 +156,15 @@ class SearchView(MethodView):
 				for tag in tags:
 					if len(tag):
 						terms['tags'][tag] = terms['tags'].get(tag, 0)+1 
-			print terms
+			most_common = most_common_queries_per_category(user)
+			# Modify data to be queried to use most common parameter per
+			# category if it hasn't been provided 
+			for k,v in data.items():
+				if not data[k] and most_common[k]:
+					data[k]=most_common[k][0][0]
 			query = actions.create_query(**data)
-			print query
-			print user.registered
 			profs = People.objects(**query).only("guid", "name")
 			user.terms_used = terms
-			print user
 			if isinstance(user.registered, str):
 				# Register date causing error to be thrown on save
 				user.registered = parse(user.registered) 

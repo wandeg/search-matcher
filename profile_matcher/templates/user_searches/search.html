@@ -22,4 +22,22 @@
   
   <button type="submit" class="btn btn-default">Submit</button>
 </form>
+{% if suggestions['param_suggestions'] %}
+  <h3>Suggested search terms based on your previous searches</h3>
+    {% for term in suggestions['param_suggestions'] %}
+      {{term[1]}} <br>
+    {% endfor %}
+{% endif %}
+
+{% if suggestions['most_viewed'] %}
+  <h3>Suggested Profiles based on your previous searches</h3>
+    <ul class="lv_ns">
+    {% for sug in suggestions['most_viewed'] %}
+      <li>
+        <a href="{{ url_for('user_searches.profile',guid=sug.guid) }}">{{sug.name}}</a> 
+      </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
 {% endblock %}
