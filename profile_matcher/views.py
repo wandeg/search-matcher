@@ -56,10 +56,11 @@ def get_users_with_similar_tags(user):
 	return similar_tags
 
 
-def get_my_common_results(user):
+def get_my_most_common_results(user):
 	my_searches = UserSearch.objects(user=user)
 	my_results = [result for search in my_searches 
 				for result in search.results]
+	# print my_results
 	return Counter(my_results).most_common(10)
 
 
@@ -76,10 +77,10 @@ class ListView(MethodView):
 			user = People.objects.get(email=session['user']['email'])
 			user_searches = UserSearch.objects(user=user).order_by('-created_at')
 			searches = get_searches()
-			similar_search_users = get_users_with_similar_searches(searches, user.guid)
-			for usr in similar_search_users:
+			similar_searchers = get_users_with_similar_searches(searches, user.guid)
+			for usr in similar_searchers:
 				user = People.objects.get(guid=usr[1])
-				print user
+				# print user
 
 		return render_template('user_searches/list.html', 
 			user_searches=user_searches)
@@ -100,17 +101,20 @@ class SearchView(MethodView):
 	def get(self):
 		if 'user' in session:
 			my_id = session['user']['guid']
-			print session['user']
+			user=People.objects.get(guid=my_id)
+			# print session['user']
 			searches = get_searches()
 			my_searches=searches[my_id]
+			# print my_searches
 			ordered_searches=sorted(my_searches.items(),
 								key=operator.itemgetter(1), reverse=True)
 			print ordered_searches
 			suggestions = get_suggestion_from_other_searches(searches,my_id)
 			print suggestions
-			similar_search_users=get_users_with_similar_searches(searches,my_id)
-			print similar_search_users
-			print [searches[k[1]] for k in similar_search_users]
+			profiles_viewed = user.profiles_viewed
+			if profiles_viewed:
+				most_viewed = Counter(profiles_viewed).most_common(3)
+			
 			return render_template('user_searches/search.html')
 		else:
 			return redirect('/login')
@@ -123,7 +127,7 @@ class SearchView(MethodView):
 		company = data['company']
 		tags = data['tags'].split(',')
 		logged_in_user = session['user']
-		user = People.objects.get(email=logged_in_user['email'])
+		user = People.objects.get(guid=logged_in_user['guid'])
 		if user:
 			terms = {'age': {}, 'gender': {}, 'company': {}, 'tags': {}}
 			if hasattr(user, 'terms_used') and user.terms_used.keys():
@@ -159,7 +163,7 @@ class SearchView(MethodView):
 			if profs:
 				search.results = profs
 			search.save()
-			return render_template('user_searches/results.html',search=search)
+			return redirect('my_searches')
 
 		return render_template('user_searches/search.html')
 
@@ -197,33 +201,35 @@ class ProfileView(MethodView):
 		profile = {}
 		user = People.objects.get(guid=guid)
 		profile['user'] = user
-		if session['user']['guid'] == user['guid']:
+		viewing_own_profile = session['user']['guid'] == user['guid']
+		if viewing_own_profile: 
 			friends = []
 			colleagues = []
 			similar_tags = []
-			most_returned = []
-
-			friends = get_users_with_similar_friends(user)[:10]
-			colleagues = get_colleagues(user)[:10]
-			similar_tags = get_users_with_similar_tags(user)[:10]
-			most_returned = get_my_common_results(user)
+			most_returned_results = []
+			most_viewed = []
+			
+			friends = get_users_with_similar_friends(user)[:5]
+			colleagues = get_colleagues(user)[:5]
+			similar_tags = get_users_with_similar_tags(user)[:5]
+			print friends,colleagues,similar_tags
+			most_returned_results = get_my_most_common_results(user)
+			print most_returned_results
+			searches = get_searches()
+			similar_searchers=get_users_with_similar_searches(searches,session['user']['guid'])
 			profile['mutual_friends'] = friends
 			profile['colleagues'] = colleagues
 			profile['similar_tags'] = similar_tags
-			profile['most_returned'] = [People.objects.get(guid=res[0])
-										for res in most_returned]
+			profile['most_returned_results'] = [res[0] for res in most_returned_results]
+			profile['similar_searchers'] = [People.objects.get(guid=res[1])
+											for res in similar_searchers]
+										
 		else:
-			# print session['user']
-			# print type(session['user'])
-			sess_user = People.objects.get(guid=session['user']['guid'])
-			profiles_viewed = sess_user.profiles_viewed
+			logged_in_user = People.objects.get(guid=session['user']['guid'])
+			profiles_viewed = logged_in_user.profiles_viewed
 			profiles_viewed[guid] = profiles_viewed.get(guid, 0)+1
-			sess_user.profiles_viewed = profiles_viewed
-			sess_user.save()
-			
-		# for usr in similar_search_users:
-		# 	user=People.objects.get(guid=usr[1])
-		# 	print user
+			logged_in_user.profiles_viewed = profiles_viewed
+			logged_in_user.save()
 
 		return render_template('user_searches/profile.html', profile=profile)
 # Register the urls

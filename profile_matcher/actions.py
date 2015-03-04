@@ -1,4 +1,5 @@
 from math import sqrt
+from operator import itemgetter
 from profile_matcher.models import People
 
 def login(email,password):
@@ -37,49 +38,33 @@ def generateAllSearches():
 		searches[user.guid]=user.unpack_terms()
 	return searches
 
-def pearson(searches,user1,user2):
+def euclidean_distance(searches,user1,user2):
 	"""
-	Use pearson's product moment correlation coeffecient to get
-	users with similar	search patterns
+	Use the euclidean distance between users to identify
+	users with similar search patterns
 	"""
-	# Get the commonly searched terms
-	common={}
-	for item in searches[user1]: 
+	
+	sim={}
+	# create similarity dictionary for all similar searches
+	# and initialize each value to 1
+	for item in searches[user1]:
 		if item in searches[user2]: 
-			common[item]=1
-
-
-	if len(common)==0: return 0
-
-
-	n=len(common)
-	print searches[user1]
-	print [i for i in common]
-
-	# Sums the searches for the common terms for each person
-	sum1=sum([searches[user1][term] for term in common])
-	sum2=sum([searches[user2][term] for term in common])
-
-	# Sums of the squares of the searches for each common term
-	sum1Sq=sum([pow(searches[user1][term],2) for term in common])
-	sum2Sq=sum([pow(searches[user2][term],2) for term in common])	
-
-	# Sum of the products
-	prodSum=sum([searches[user1][term]*searches[user2][term] for term in common])
-
-	num=prodSum-(sum1*sum2/n)
-	den=sqrt((sum1Sq-pow(sum1,2)/n)*(sum2Sq-pow(sum2,2)/n))
-	if den==0: return 0
-
-	similarity=num/den
-
-	return similarity
+			sim[item]=1
+		# if they have no searches in common, return 0
+	if len(sim)==0: return 0
+	# Add up the squares of all the differences in search frequencies
+	sum_of_squares=sum([pow(searches[user1][item]-searches[user2][item],2) 
+					for item in sim])
+	# Add one to denominator to prevent division by zero error
+	# Reciprocate so that higher values are given to people most similar
+	return 1.0/(1+sum_of_squares)
 
 def mostSimilar(searches,me,n=3):
 	""" Returns the n users most similar to me based on their search terms
 	Goes through all users.
 	"""
-	scores=[(pearson(searches,me,user),user)
+	
+	scores=[(euclidean_distance(searches,me,user),user)
 		for user in searches if user!=me]
 	# Sort the list so the highest scores appear at the top
 	scores.sort(reverse=True)
@@ -97,7 +82,7 @@ def getSearchSuggestions(searches,me):
 		# don't compare me to myself
 		if user==me: 
 			continue
-		sim=pearson(searches,me,user)
+		sim=euclidean_distance(searches,me,user)
 
 		# ignore scores of zero or lower to prevent division by zero
 		if sim<=0: 
@@ -120,26 +105,3 @@ def getSearchSuggestions(searches,me):
 	rankings.sort(reverse=True)
 	return rankings
 
-def invertSearches(searches):
-	"""
-	Flips the search dictionary from {user:searchterms} to {searchterm:users}
-	"""
-	result={}
-	for user in searches:
-		for term in searches[user]:
-			result[term]=result.get(term,{})
-			# Flip term and user
-			result[term][user]=searches[user][term]
-	return result
-
-def getSimilarTerms(searches,n=10):
-	"""Create a dictionary of each term showing which other terms they
-				are most similar to."""
-	result={}
-	# Invert the search matrix to be term-centric
-	termSearches=invertSearches(searches)
-	for term in termSearches:
-		# Find the most similar terms to this one
-		scores=mostSimilar(termSearches,term,n=n)
-		result[term]=scores
-	return result

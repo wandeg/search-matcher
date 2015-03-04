@@ -60,7 +60,3 @@ class UserSearch(db.Document):
 	terms = db.DictField()
 	results = db.ListField()
 
-
-class ProfileView(db.Document):
-	user = db.ReferenceField('People', reverse_delete_rule=CASCADE)
-	profile_viewed = db.StringField()
