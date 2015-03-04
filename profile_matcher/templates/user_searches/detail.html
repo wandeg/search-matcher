@@ -2,27 +2,33 @@
 
 {% block page_header %}
   <div class="page-header">
-    <h1>{{ search.title }}</h1>
+    <h1>Search Results</h1>
   </div>
 {% endblock %}
 
 {% block content %}
-  <p>{{ search.created_at.strftime('%H:%M %Y-%m-%d') }}</p>
+  <p>Searched on: {{ search.created_at.strftime('%H:%M %Y-%m-%d') }}</p>
   <hr>
   <h2>Parameters</h2>
   {% if search.terms %}
     {% set terms = search.terms %}
-      <p>Age: {{terms.age}}</p>
-      <p>Company: {{terms.company}}</p>
-      <p>Gender: {{terms.gender}}</p>
-      <p>Tags:{{terms.tags}}</p>
-      
-    
+      {% if terms.age %}
+        <p>Age: {{terms.age}}</p>
+      {% endif %}
+      {% if terms.company %}
+        <p>Company: {{terms.company}}</p>
+      {% endif %}
+      {% if terms.gender %}
+        <p>Gender: {{terms.gender}}</p>
+      {% endif %}
+      {% if terms.tags %}
+        <p>Tags:{{terms.tags}}</p>
+      {% endif %}
   {% endif %}
   <h2>Results</h2>
   {% if search.results %}
     {% for res in search.results %}
-       <a href="/profile/{{ res.guid }}">{{res.name}}</a>
+       <a href="/profile/{{ res.guid }}">{{res.name}}</a>,
        
     {% endfor %}
   {% endif %}

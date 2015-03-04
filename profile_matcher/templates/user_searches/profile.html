@@ -5,6 +5,8 @@
   <div id="profile-header">
   	<img id="profile-img" src="{{profile['user'].picture}}">
     <h1>{{ profile['user']['name'] }}</h1>
+    <p>{{ profile['user']['age'] }} years old</p>
+    <p>{{ profile['user']['gender'] |capitalize }}</p>
     <p>Works at {{profile['user'].company}}</p>
   </div>
   
@@ -65,9 +67,9 @@
 	</ul>
 	{% endif %}
 
-	{% if profile['most_returned'] %}
+	{% if profile['most_returned_results'] %}
 	<ul class="lv_ns">
-	{% for res in profile['most_returned'] %}
+	{% for res in profile['most_returned_results'] %}
 		{% if res.guid != profile['user']['guid'] %}
 		<li>
 			<a href="{{ url_for('user_searches.profile',guid=res.guid) }}">
@@ -78,6 +80,20 @@
 	</ul>
 	{% endif %}
 
+	{% if profile['similar_searchers'] %}
+	<ul class="lv_ns">
+	{% for sim in profile['similar_searchers'] %}
+		{% if sim.guid != profile['user']['guid'] %}
+		<li>
+			<a href="{{ url_for('user_searches.profile',guid=sim.guid) }}">
+			{{sim.name}}</a><span class="right"> You have similar search patterns</span>
+		</li>
+		{% endif %}
+	{% endfor %}
+	</ul>
+	{% endif %}
+
+	
 </div>
 {%endif %}
   
