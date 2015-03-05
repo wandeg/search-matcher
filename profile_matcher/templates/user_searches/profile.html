@@ -67,9 +67,9 @@
 	</ul>
 	{% endif %}
 
-	{% if profile['most_returned_results'] %}
+	{% if profile['most_returned'] %}
 	<ul class="lv_ns">
-	{% for res in profile['most_returned_results'] %}
+	{% for res in profile['most_returned'] %}
 		{% if res.guid != profile['user']['guid'] %}
 		<li>
 			<a href="{{ url_for('user_searches.profile',guid=res.guid) }}">

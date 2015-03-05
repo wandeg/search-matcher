@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-
+<h1>Search for Profiles</h1>
 <form method="POST" action="{{url_for('user_searches.search')}}">
   <div class="form-group">
     <label for="searchAge">Age</label>
@@ -19,13 +19,20 @@
     <label for="searchTags">Tags (comma separated)</label>
     <input type="text" name="tags" class="form-control" id="searchTags" placeholder="e.g tag1,tag2">
   </div>
-  
+  <div class="form-group">
+      <div class="checkbox">
+        <label for="intellisense">
+          <input type="checkbox" name="intellisense"  id="intellisense" >Use Intellisense
+        </label>
+      </div>
+      <mark><em>* Any empty values will be populated based on your most frequent searches if this is selected</em></mark>
+  </div>
   <button type="submit" class="btn btn-default">Submit</button>
 </form>
 {% if suggestions['param_suggestions'] %}
   <h3>Suggested search terms based on your previous searches</h3>
     {% for term in suggestions['param_suggestions'] %}
-      {{term[1]}} <br>
+      {{term[1]}}
     {% endfor %}
 {% endif %}
 

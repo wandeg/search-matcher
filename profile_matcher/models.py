@@ -2,7 +2,8 @@ import datetime
 from flask import url_for
 from profile_matcher import db
 from mongoengine import *
-from werkzeug.security import generate_password_hash,check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 class People(db.Document):
 	id = db.IntField()
@@ -59,4 +60,3 @@ class UserSearch(db.Document):
 	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
 	terms = db.DictField()
 	results = db.ListField()
-

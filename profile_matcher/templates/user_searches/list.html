@@ -2,12 +2,18 @@
 
 {% block content %}
     {% for search in user_searches %}
-      <h2><a href="{{ url_for('user_searches.detail', slug=search.slug) }}">Search {{ loop.index }}</a></h2>
-      <p>
-        {{ search.created_at.strftime('%H:%M %Y-%m-%d') }} |
-        {% with total=search.results|length %}
-            {{ total }} result {%- if total > 1 %}s{%- endif -%}
-        {% endwith %}
-      </p>
+    <ul class="lv_ns">
+    	<li>
+    		<a href="{{ url_for('user_searches.detail', slug=search.slug) }}">Search {{ loop.index }}</a>
+	        {% with total=search.results|length %}
+				<span class="badge">{{ total }}</span>Result {%- if total > 1 %}s{%- endif -%}
+	        {% endwith %}
+	        <span class="right">
+		        {{ search.created_at.strftime('%H:%M %Y-%m-%d') }}
+		       </span>
+    	</li>
+    </ul>
+      
+
     {% endfor %}
 {% endblock %}

@@ -157,7 +157,11 @@ ul.lv_ns[hidden] {
 .lv_ns li .right {
     float: right;
 }
-img#profile-img {
-border: 0;
-height: 200px;
+.lv_ns li > a:not(.btn) {
+  color: rgb(29, 40, 160);
 }
+img#profile-img {
+  border: 0;
+  height: 200px;
+}
+
