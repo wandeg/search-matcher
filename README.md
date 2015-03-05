@@ -11,10 +11,12 @@ This appears on an individual's profile. It is based on several factors such as:
 All search and profile matching is done by and elementary form of collaborative filterting using an Euclidean distance calculator that analyzes a user against the rest of the users
 
 
-Prerequisites:
+# Prerequisites:
+
 Python 2.7
 MongoDb 2.6+
-Installation
+
+# Installation
 This is preferrably done within a virtualenv - Instructions for setting one up can be found here: https://virtualenvwrapper.readthedocs.org/en/latest/
 
 Once that is done activate the virtualenv. 
