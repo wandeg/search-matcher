@@ -1,11 +1,11 @@
 # search-matcher
 Match people based on common search patterns
 
-Search Engine
+# Search Engine
 The search engine allows you to query for user profiles using several parameters such as age, gender, company and tags. The parameters and results are stored so that the engine can adapt to previous searches and generate suggestions.
 
 
-People you may know:
+# People you may know:
 This appears on an individual's profile. It is based on several factors such as: mutual friends, similar search parameters, results that appear most frequently in your searches and users with similar properties such as tags, and company.
 
 All search and profile matching is done by and elementary form of collaborative filterting using an Euclidean distance calculator that analyzes a user against the rest of the users
