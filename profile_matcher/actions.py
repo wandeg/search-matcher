@@ -4,6 +4,7 @@ from profile_matcher.models import People
 
 
 def login(email, password):
+	"""Attempts to log in the user"""
 	user = None
 	valid = False
 	try:
@@ -16,6 +17,7 @@ def login(email, password):
 
 
 def create_query(**params):
+	"""Returns a query dict that will be used for filtering"""
 	query = {}
 	if 'age' in params:
 		if params['age']:
@@ -35,6 +37,9 @@ def create_query(**params):
 
 
 def generateAllSearches():
+	"""Reterns all the searches for all the users in dictionary form 
+	where the keys are the user guids and the values are dictionaries 
+	of the user search terms and their frequencies"""
 	people = People.objects.all()
 	searches = {}
 	for user in people:
