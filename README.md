@@ -6,7 +6,7 @@ The search engine allows you to query for user profiles using several parameters
 
 
 # People you may know:
-This appears on an individual's profile. It is based on several factors such as: mutual friends, similar search parameters, results that appear most frequently in your searches and users with similar properties such as tags, and company.
+This appears on an individual's profile. It is based on several factors such as: mutual friends, similar search parameters, results that appear most frequently in your searches and users with similar properties such as tags, and company. If you have no searches you will be matched to people with no searches.
 
 All search and profile matching is done by and elementary form of collaborative filterting using an Euclidean distance calculator that analyzes a user against the rest of the users
 
@@ -43,3 +43,4 @@ The engine will track your searches and optimize results and suggestions based o
 2. Choice of database - MongoDB was used because of the structure of the data. The use of a key-value storage was best suited for the json data.
 3. Choice of language - Python was used due to its usefulness in rapid prototyping and its ability to increase overall programmer productivity by reducing programmer time
 4. Choice of framework - Flask was used due to its light footprint and its extensibility since it's a micro-framework
+5. Use of Document Mapper - Mongoengine was used as an ODM for this project for its ability to aid in data modeling and its built in support for Flask
